@@ -4,6 +4,7 @@
 #include "sph_solver.h"
 #include "transparency.h"
 #include "visualization_utils.h" 
+#include <mpi.h>
 
 void printUsage() {
     std::cout << "Usage: ./galactic_tourism <option>\n"
@@ -30,8 +31,14 @@ std::vector<Particle> initializeParticles(int numParticles, double mass) {
 
 int main(int argc, char** argv) {
 
+    MPI_Init(&argc, &argv); // Initialize MPI
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank); // Get MPI rank
+    MPI_Comm_size(MPI_COMM_WORLD, &size); // Get number of MPI processes
+
     if (argc < 2) {
-        printUsage();
+        if (rank == 0) printUsage(); // Only rank 0 prints usage
+        MPI_Finalize();
         return 1;
     }
     
@@ -46,8 +53,23 @@ int main(int argc, char** argv) {
     const double dt = 0.01;                  // Time step for simulation
     const int numParticles = 1000;           // Number of particles
 
-    // Initialize particles
-    std::vector<Particle> particles = initializeParticles(numParticles, mass);
+    // Initialize particles (on rank 0)
+    std::vector<Particle> particles;
+    if (rank == 0) {
+        particles = initializeParticles(numParticles, mass);
+    }
+
+    // Partition particles among MPI processes
+    int particlesPerProcess = numParticles / size;
+    int startIdx = rank * particlesPerProcess;
+    int endIdx = (rank == size - 1) ? numParticles : startIdx + particlesPerProcess;
+
+    std::vector<Particle> localParticles(particlesPerProcess);
+
+    // Distribute particles using MPI_Scatter
+    MPI_Scatter(particles.data(), particlesPerProcess * sizeof(Particle), MPI_BYTE,
+                localParticles.data(), particlesPerProcess * sizeof(Particle), MPI_BYTE,
+                0, MPI_COMM_WORLD);
 
     // Create SPH and Transparency solvers
     SPHSolver sphSolver(smoothingLength, mass, gasConstant, restDensity);
@@ -67,17 +89,28 @@ int main(int argc, char** argv) {
             p.z += p.vz * dt;
         }
 
-        // Optional: Output intermediate results for monitoring
+        // Exchange boundary data between MPI processes
+        exchangeBoundaryParticles(localParticles, rank, size);
+
+        // Output intermediate results for monitoring
         if (step % 10 == 0) {
             std::cout << "Completed step " << step << std::endl;
         }
     }
 
-    // Calculate transparency map using Madau model after simulation
-    std::vector<double> transparencyMap = transparencyCalculator.calculateTransparencyWithMadau(particles);
-    transparencyCalculator.saveTransparencyMap(transparencyMap, "transparency_map_with_madau.txt");
+    // Gather results on rank 0
+    MPI_Gather(localParticles.data(), particlesPerProcess * sizeof(Particle), MPI_BYTE,
+               particles.data(), particlesPerProcess * sizeof(Particle), MPI_BYTE,
+               0, MPI_COMM_WORLD);
 
-    std::cout << "Simulation complete. Transparency map saved to transparency_map_with_madau.txt" << std::endl;
+    if (rank == 0) {
+        // Calculate transparency map
+        std::vector<double> transparencyMap = transparencyCalculator.calculateTransparencyWithMadau(particles);
+        transparencyCalculator.saveTransparencyMap(transparencyMap, "transparency_map_with_madau.txt");
+        std::cout << "Simulation complete. Transparency map saved to transparency_map_with_madau.txt" << std::endl;
+    }
+
+    MPI_Finalize(); // Finalize MPI
 
     return 0;
 }
