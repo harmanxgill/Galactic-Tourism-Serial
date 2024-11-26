@@ -1,4 +1,3 @@
-// transparency.h
 #ifndef TRANSPARENCY_H
 #define TRANSPARENCY_H
 
@@ -6,15 +5,15 @@
 #include "particle.h"
 
 class TransparencyCalculator {
+private:
+    double transparencyThreshold;
+    double redshift;
+
 public:
-    TransparencyCalculator(double threshold, double redshift);
+    TransparencyCalculator(double transparencyThreshold, double redshift);
+    std::vector<double> calculateTransparency(const std::vector<Particle>& particles);
     std::vector<double> calculateTransparencyWithMadau(const std::vector<Particle>& particles);
     void saveTransparencyMap(const std::vector<double>& transparencyMap, const std::string& filename);
-
-private:
-    double threshold; // Density threshold for transparency
-    double redshift; // Redshift parameter for Madau model
-    double computeOpticalDepth(double density) const; // Madau optical depth calculation
 };
 
-#endif // TRANSPARENCY_H
+#endif
