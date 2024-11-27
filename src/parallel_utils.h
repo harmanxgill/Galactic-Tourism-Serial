@@ -4,8 +4,10 @@
 #include <vector>
 #include "particle.h"
 #include <mpi.h>
+#include <cmath>
+using namespace std;
 
 // Function to exchange boundary particles between neighboring MPI processes
-void exchangeBoundaryParticles(std::vector<Particle>& particles, int rank, int size);
+void exchangeBoundaryParticles(vector<Particle>& particles, int rank, int size);
 
 #endif

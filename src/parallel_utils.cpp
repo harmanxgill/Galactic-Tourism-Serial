@@ -1,21 +1,23 @@
 // parallel_utils.cpp
 #include "parallel_utils.h"
 #include <algorithm> 
+#include <cmath>
+using namespace std;
 
-void exchangeBoundaryParticles(std::vector<Particle>& particles, int rank, int size) {
+void exchangeBoundaryParticles(vector<Particle>& particles, int rank, int size) {
     MPI_Status status;
     int particlesToSend = 10;  // Example: number of particles at boundaries to exchange
     int boundarySize = particlesToSend * sizeof(Particle);
 
     // Buffers for sending and receiving boundary data
-    std::vector<Particle> sendLeft(particlesToSend);
-    std::vector<Particle> sendRight(particlesToSend);
-    std::vector<Particle> recvLeft(particlesToSend);
-    std::vector<Particle> recvRight(particlesToSend);
+    vector<Particle> sendLeft(particlesToSend);
+    vector<Particle> sendRight(particlesToSend);
+    vector<Particle> recvLeft(particlesToSend);
+    vector<Particle> recvRight(particlesToSend);
 
     // Fill buffers with boundary particles
-    std::copy(particles.begin(), particles.begin() + particlesToSend, sendLeft.begin()); // Left boundary
-    std::copy(particles.end() - particlesToSend, particles.end(), sendRight.begin());    // Right boundary
+    copy(particles.begin(), particles.begin() + particlesToSend, sendLeft.begin()); // Left boundary
+    copy(particles.end() - particlesToSend, particles.end(), sendRight.begin());    // Right boundary
 
     // Exchange particles with neighboring processes
     if (rank > 0) {

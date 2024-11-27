@@ -1,5 +1,7 @@
 // particle.cpp
 #include "particle.h"
+#include <cmath>
+using namespace std;
 
 // Default constructor
 Particle::Particle() 

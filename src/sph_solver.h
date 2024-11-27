@@ -1,19 +1,20 @@
-// sph_solver.h
 #ifndef SPH_SOLVER_H
 #define SPH_SOLVER_H
 
 #include <vector>
+#include <cmath>
 #include "particle.h"
+using namespace std;
 
-class SPHSolver{
+class SPHSolver {
     public:
     // Constructor
     SPHSolver(double smoothingLength, double mass, double gasConstant, double restDensity);
 
     // Main SPH computation functions
-    void computeDensity(std::vector<Particle>& particles);
-    void computePressure(std::vector<Particle>& particles);
-    void computeForces(std::vector<Particle>& particles);
+    void computeDensity(vector<Particle>& particles);
+    void computePressure(vector<Particle>& particles);
+    void computeForces(vector<Particle>& particles);
 
     private:
     // SPH Kernel functions

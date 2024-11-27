@@ -3,6 +3,8 @@
 #define PARTICLE_H
 
 #include <vector>
+#include <cmath>
+using namespace std;
 
 class Particle {
     public:

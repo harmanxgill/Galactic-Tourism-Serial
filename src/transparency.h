@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <string> 
+#include <cmath>
 #include "particle.h"
+using namespace std;
 
 class TransparencyCalculator {
 private:
@@ -12,8 +14,9 @@ private:
 
 public:
     TransparencyCalculator(double transparencyThreshold, double redshift);
-    std::vector<double> calculateTransparency(const std::vector<Particle>& particles);
-    std::vector<double> calculateTransparencyWithMadau(const std::vector<Particle>& particles);
-    void saveTransparencyMap(const std::vector<double>& transparencyMap, const std::string& filename);
-}
+    vector<double> calculateTransparency(const vector<Particle>& particles);
+    vector<double> calculateTransparencyWithMadau(const vector<Particle>& particles);
+    void saveTransparencyMap(const vector<double>& transparencyMap, const string& filename);
+};
+
 #endif

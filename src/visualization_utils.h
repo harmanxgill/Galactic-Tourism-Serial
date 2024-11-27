@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 #include "particle.h"
+using namespace std;
 
 class VisualizationUtils {
 public:
-    static void saveDensityMap(const std::vector<Particle>& particles, const std::string& filename);
-    static void visualizeMap(const std::vector<double>& map, int width, int height);
+    static void saveDensityMap(const vector<Particle>& particles, const string& filename);
+    static void visualizeMap(const vector<double>& map, int width, int height);
 };
 
 #endif

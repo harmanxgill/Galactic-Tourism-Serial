@@ -8,21 +8,23 @@
 #include <iostream>
 #include <string>
 #include <mpi.h>
+#include <cmath>
+using namespace std;
 
 void printUsage() {
-    std::cout << "Usage: ./galactic_tourism <option>\n"
-              << "Options:\n"
-              << "  run                - Run the SPH simulation\n"
-              << "  visualize_density  - Visualize density map\n"
-              << "  visualize_transparency - Visualize transparency map\n"
-              << "  animate_density    - Generate density animation\n"
-              << "  animate_transparency - Generate transparency animation\n"
-              << std::endl;
+    cout << "Usage: ./galactic_tourism <option>\n"
+         << "Options:\n"
+         << "  run                - Run the SPH simulation\n"
+         << "  visualize_density  - Visualize density map\n"
+         << "  visualize_transparency - Visualize transparency map\n"
+         << "  animate_density    - Generate density animation\n"
+         << "  animate_transparency - Generate transparency animation\n"
+         << endl;
 }
 
 // Function to initialize particles with random positions (or specific initial conditions)
-std::vector<Particle> initializeParticles(int numParticles, double mass) {
-    std::vector<Particle> particles;
+vector<Particle> initializeParticles(int numParticles, double mass) {
+    vector<Particle> particles;
     for (int i = 0; i < numParticles; ++i) {
         double x = static_cast<double>(rand()) / RAND_MAX;
         double y = static_cast<double>(rand()) / RAND_MAX;
@@ -57,7 +59,7 @@ int main(int argc, char** argv) {
     const int numParticles = 1000;           // Number of particles
 
     // Initialize particles (on rank 0)
-    std::vector<Particle> particles;
+    vector<Particle> particles;
     if (rank == 0) {
         particles = initializeParticles(numParticles, mass);
     }
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
     int startIdx = rank * particlesPerProcess;
     int endIdx = (rank == size - 1) ? numParticles : startIdx + particlesPerProcess;
 
-    std::vector<Particle> localParticles(particlesPerProcess);
+    vector<Particle> localParticles(particlesPerProcess);
 
     // Distribute particles using MPI_Scatter
     MPI_Scatter(particles.data(), particlesPerProcess * sizeof(Particle), MPI_BYTE,
@@ -97,7 +99,7 @@ int main(int argc, char** argv) {
 
         // Output intermediate results for monitoring
         if (step % 10 == 0) {
-            std::cout << "Completed step " << step << std::endl;
+            cout << "Completed step " << step << endl;
         }
     }
 
@@ -108,9 +110,9 @@ int main(int argc, char** argv) {
 
     if (rank == 0) {
         // Calculate transparency map
-        std::vector<double> transparencyMap = transparencyCalculator.calculateTransparencyWithMadau(particles);
+        vector<double> transparencyMap = transparencyCalculator.calculateTransparencyWithMadau(particles);
         transparencyCalculator.saveTransparencyMap(transparencyMap, "transparency_map_with_madau.txt");
-        std::cout << "Simulation complete. Transparency map saved to transparency_map_with_madau.txt" << std::endl;
+        cout << "Simulation complete. Transparency map saved to transparency_map_with_madau.txt" << endl;
     }
 
     MPI_Finalize(); // Finalize MPI
