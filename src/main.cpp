@@ -4,6 +4,7 @@
 #include "sph_solver.h"
 #include "transparency.h"
 #include "visualization_utils.h" 
+#include "parallel_utils.h"
 #include <mpi.h>
 
 void printUsage() {
