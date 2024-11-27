@@ -5,6 +5,8 @@
 #include "transparency.h"
 #include "visualization_utils.h" 
 #include "parallel_utils.h"
+#include <iostream>
+#include <string>
 #include <mpi.h>
 
 void printUsage() {

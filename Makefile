@@ -3,26 +3,29 @@ CXX = mpicxx
 CXXFLAGS = -fopenmp -O3 -std=c++17 -Wall
 TARGET = galactic_tourism
 
-# Source files
-SOURCES = main.cpp particle.cpp sph_solver.cpp transparency.cpp visualization_utils.cpp parallel_utils.cpp
+# Paths
+SRC_DIR = src
+BUILD_DIR = build
 
-# Object files
-OBJECTS = $(SOURCES:.cpp=.o)
+# Source and object files
+SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
+OBJECTS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SOURCES))
 
 # Default target
 all: $(TARGET)
 
-# Linking target
+# Link the target
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJECTS)
 
-# Compile individual source files
-%.o: %.cpp
+# Compile source files into object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up build files
+# Clean up build and executable files
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -rf $(BUILD_DIR) $(TARGET)
 
 # Phony targets
 .PHONY: all clean
