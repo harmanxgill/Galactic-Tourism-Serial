@@ -1,7 +1,5 @@
-// sph_solver.cpp
 #include "sph_solver.h"
 #include <cmath>
-#include <omp.h>
 using namespace std;
 
 // Constructor
@@ -28,7 +26,6 @@ double SPHSolver::spikyKernelGrad(double r, double h) const {
 
 // Compute density for each particle
 void SPHSolver::computeDensity(vector<Particle>& particles) {
-    #pragma omp parallel for schedule(dynamic) // Parallelize the outer loop
     for (auto& pi : particles) {
         pi.setDensity(0.0);
         for (const auto& pj : particles) {
@@ -40,7 +37,6 @@ void SPHSolver::computeDensity(vector<Particle>& particles) {
 
 // Compute pressure for each particle based on density
 void SPHSolver::computePressure(vector<Particle>& particles) {
-    #pragma omp parallel for schedule(dynamic)
     for (auto& p : particles) {
         double pressure = gasConstant * (p.getDensity() - restDensity);
         p.setPressure(pressure > 0 ? pressure : 0.0);  // Prevent negative pressure
@@ -49,7 +45,6 @@ void SPHSolver::computePressure(vector<Particle>& particles) {
 
 // Compute forces on each particle from pressure differences
 void SPHSolver::computeForces(vector<Particle>& particles) {
-    #pragma omp parallel for schedule(dynamic)
     for (auto& pi : particles) {
         double fx = 0.0, fy = 0.0, fz = 0.0;
 

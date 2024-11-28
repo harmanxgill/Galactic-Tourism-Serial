@@ -1,6 +1,6 @@
 # Compiler and flags
-CXX = mpicxx
-CXXFLAGS = -fopenmp -O3 -std=c++17 -Wall
+CXX = g++                     # Use g++ instead of mpicxx since we are not using MPI
+CXXFLAGS = -O3 -std=c++17 -Wall # Removed OpenMP and MPI flags, only optimization and C++17 standard
 TARGET = galactic_tourism
 
 # Paths

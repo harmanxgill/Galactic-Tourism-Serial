@@ -7,8 +7,8 @@
 using namespace std;
 
 class SPHSolver {
-    public:
-    // Constructor
+public:
+    // Constructor to initialize the SPH solver with necessary parameters
     SPHSolver(double smoothingLength, double mass, double gasConstant, double restDensity);
 
     // Main SPH computation functions
@@ -16,16 +16,16 @@ class SPHSolver {
     void computePressure(vector<Particle>& particles);
     void computeForces(vector<Particle>& particles);
 
-    private:
+private:
     // SPH Kernel functions
     double poly6Kernel(double r, double h) const;
     double spikyKernelGrad(double r, double h) const;
 
     // SPH Constants
-    double smoothingLength;
-    double mass;
-    double gasConstant;
-    double restDensity;
+    double smoothingLength;   // Smoothing length (h)
+    double mass;              // Mass of each particle
+    double gasConstant;       // Gas constant for pressure calculation
+    double restDensity;       // Rest density of the particles
 };
 
 #endif // SPH_SOLVER_H
