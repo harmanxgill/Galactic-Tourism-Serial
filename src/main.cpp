@@ -20,16 +20,53 @@ void printUsage() {
 }
 
 // Function to initialize particles with random positions (or specific initial conditions)
+// Function to initialize particles with random positions (and assign unique IDs)
 vector<Particle> initializeParticles(int numParticles, double mass) {
     vector<Particle> particles;
+    const double boxSize = 0.0928; // Box size
+    double maxVelocity = 0.5; 
+
     for (int i = 0; i < numParticles; ++i) {
-        double x = static_cast<double>(rand()) / RAND_MAX;
-        double y = static_cast<double>(rand()) / RAND_MAX;
-        double z = static_cast<double>(rand()) / RAND_MAX;
-        particles.emplace_back(x, y, z, mass);
+        double x = static_cast<double>(rand()) / RAND_MAX * boxSize; 
+        double y = static_cast<double>(rand()) / RAND_MAX * boxSize; 
+        double z = static_cast<double>(rand()) / RAND_MAX * boxSize; 
+
+        double vx = (static_cast<double>(rand()) / RAND_MAX) * maxVelocity;
+        double vy = (static_cast<double>(rand()) / RAND_MAX) * maxVelocity;
+        double vz = (static_cast<double>(rand()) / RAND_MAX) * maxVelocity;
+        
+       Particle p(x, y, z, mass, i);
+        p.setVx(vx);  // Set velocity
+        p.setVy(vy);
+        p.setVz(vz);
+        p.setDensity(0);             // Set density
+        p.setPressure(0);            // Set pressure
+        particles.push_back(p);
+
+       cout << "Particle " << i << " -> x: " << x << ", y: " << y << ", z: " << z
+     << ", vx: " << p.getVx() << ", vy: " << p.getVy() << ", vz: " << p.getVz()
+     << ", density: " << p.getDensity() << ", pressure: " << p.getPressure() << endl;
     }
+
     return particles;
 }
+
+// Function to print particle specs
+void printParticleSpecs(const vector<Particle>& particles, int step) {
+    cout << "Step " << step << ":\n";
+    for (size_t i = 0; i < particles.size(); ++i) {
+        const Particle& p = particles[i];
+        cout << "Particle " << i << " -> x: " << p.getX() 
+             << ", y: " << p.getY()
+             << ", z: " << p.getZ()
+             << ", vx: " << p.getVx() 
+             << ", vy: " << p.getVy()
+             << ", vz: " << p.getVz()
+             << ", density: " << p.getDensity() 
+             << ", pressure: " << p.getPressure() << endl;
+    }
+}
+
 
 int main(int argc, char** argv) {
 
@@ -43,11 +80,11 @@ int main(int argc, char** argv) {
     const double mass = 1.0;                 // Mass of each particle
     const double gasConstant = 1000.0;       // Constant for pressure calculation
     const double restDensity = 1.0;          // Rest density of particles
-    const double transparencyThreshold = 0.5; // Threshold density for transparency
-    const double redshift = 2.0;             // Redshift parameter for Madau model
-    const int numSteps = 100;                // Number of simulation steps
-    const double dt = 0.01;                  // Time step for simulation
-    const int numParticles = 1000;           // Number of particles
+    const double transparencyThreshold = 0.3; // Threshold density for transparency
+    const double redshift = 1.0;             // Redshift parameter for Madau model
+    const int numSteps = 1000;                // Number of simulation steps
+    const double dt = 100;                  // Time step for simulation
+    const int numParticles = 10;           // Number of particles
 
     // Initialize particles
     vector<Particle> particles = initializeParticles(numParticles, mass);
@@ -70,10 +107,11 @@ int main(int argc, char** argv) {
             p.z += p.vz * dt;
         }
 
-        // Output intermediate results for monitoring
-        if (step % 10 == 0) {
-            cout << "Completed step " << step << endl;
+        // Print particle specs for this timestep
+        if (step % 100 == 0) {
+            printParticleSpecs(particles, step);
         }
+        
     }
 
     // Calculate transparency map
